@@ -96,7 +96,11 @@ app.post("/webhook", async (req, res) => {
           "Sorry, I encountered an issue. Please try again or visit billionaireschow.vercel.app 🍕"
         );
       } catch (e) {
-        console.error("Failed to send error message:"// ============================================================
+        console.error("Failed to send error message:", e);
+      }
+    }
+  }
+});
 // 3. GENERATE RESPONSE USING GROQ AI
 // ============================================================
 async function generateResponseGroq(userMessage, phoneNumberId) {
