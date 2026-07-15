@@ -118,10 +118,12 @@ async function generateResponseGroq(userMessage) {
 
 MENU & PRICES:
 
-🍕 PIZZA (All from ₦11,500):
-- Billionaires Beef Pizza
-- Billionaires Chicken Pizza
-- Billionaires Special Pizza
+🍕 PIZZA:
+Premium (Beef, Special, Suya Pepper, Chicken Suya Pepper):
+- Medium: ₦11,500 | Large: ₦14,000 | Jumbo: ₦23,000
+
+Standard (Chicken, Sausage):
+- Medium: ₦10,000 | Large: ₦13,000 | Jumbo: ₦23,000
 
 🥙 SHAWARMA:
 - Billionaires Chicken Shawarma - ₦5,000
