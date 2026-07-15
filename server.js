@@ -13,7 +13,7 @@ const WEBHOOK_VERIFY_TOKEN = process.env.WEBHOOK_VERIFY_TOKEN;
 const PORT = process.env.PORT || 3000;
 
 // Groq model to use
-const GROQ_MODEL = "llama3-8b-8192";
+const GROQ_MODEL = "llama-3.1-8b-instant";
 
 console.log("✅ Environment loaded");
 console.log(`📱 Phone Number ID: ${PHONE_NUMBER_ID}`);
