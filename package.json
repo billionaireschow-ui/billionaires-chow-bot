@@ -1,0 +1,28 @@
+{
+  "name": "billionaires-chow-bot",
+  "version": "1.0.0",
+  "description": "WhatsApp Business Bot for Billionaires Chow using Groq AI",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "whatsapp",
+    "bot",
+    "groq",
+    "ai",
+    "pizza",
+    "shawarma"
+  ],
+  "author": "Nisi Technologies",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.18.1",
+    "dotenv": "^16.6.1",
+    "express": "^4.22.2"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
