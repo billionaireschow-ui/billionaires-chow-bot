@@ -12,8 +12,10 @@ const ACCESS_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN;
 const WEBHOOK_VERIFY_TOKEN = process.env.WEBHOOK_VERIFY_TOKEN;
 const PORT = process.env.PORT || 3000;
 
-// Groq model to use
 const GROQ_MODEL = "llama-3.1-8b-instant";
+
+// Simple in-memory store for conversations
+const userSessions = {};
 
 console.log("✅ Environment loaded");
 console.log(`📱 Phone Number ID: ${PHONE_NUMBER_ID}`);
@@ -79,7 +81,7 @@ app.post("/webhook", async (req, res) => {
 
         // Generate AI response
         console.log("🤔 Generating response...");
-        const aiResponse = await generateResponseGroq(msgBody);
+        const aiResponse = await generateResponseGroq(msgBody, from);
         console.log(`📤 AI Response: ${aiResponse}`);
 
         // Send response via WhatsApp
@@ -94,27 +96,25 @@ app.post("/webhook", async (req, res) => {
           "Sorry, I encountered an issue. Please try again or visit billionaireschow.vercel.app 🍕"
         );
       } catch (e) {
-        console.error("Failed to send error message:", e);
-      }
-    }
-  }
-});
-
-// ============================================================
+        console.error("Failed to send error message:"// ============================================================
 // 3. GENERATE RESPONSE USING GROQ AI
 // ============================================================
-async function generateResponseGroq(userMessage) {
+async function generateResponseGroq(userMessage, phoneNumberId) {
   try {
     console.log("   📡 Calling Groq API...");
 
-    const response = await axios.post(
-      "https://api.groq.com/openai/v1/chat/completions",
-      {
-        model: GROQ_MODEL,
-        messages: [
-          {
-            role: "system",
-            content: `You are the Billionaires Chow customer service representative. Professional, warm, and efficient.
+    if (!userSessions[phoneNumberId]) {
+      userSessions[phoneNumberId] = [];
+    }
+
+    userSessions[phoneNumberId].push({ role: "user", content: userMessage });
+
+    // Keep history manageable (last 10 messages)
+    if (userSessions[phoneNumberId].length > 10) {
+      userSessions[phoneNumberId].splice(0, 2);
+    }
+
+    const systemPrompt = `You are the Billionaires Chow customer service representative. Professional, warm, and efficient.
 
 MENU & PRICES:
 
@@ -180,12 +180,15 @@ Out of scope: "We focus exclusively on pizza and shawarma. However, our Special 
 
 Pricing question: "All our pizzas start at ₦10,000 for medium and go up to ₦23,000 for jumbo sizes. What's your budget?"
 
-TONE: Professional, helpful, confident. Not stiff, but not casual.`,
-          },
-          {
-            role: "user",
-            content: userMessage,
-          },
+TONE: Professional, helpful, confident. Not stiff, but not casual.`;
+
+    const response = await axios.post(
+      "https://api.groq.com/openai/v1/chat/completions",
+      {
+        model: GROQ_MODEL,
+        messages: [
+          { role: "system", content: systemPrompt },
+          ...userSessions[phoneNumberId]
         ],
         temperature: 0.7,
         max_tokens: 150,
@@ -199,7 +202,9 @@ TONE: Professional, helpful, confident. Not stiff, but not casual.`,
     );
 
     console.log("   ✅ Groq response received");
-    return response.data.choices[0].message.content;
+    const aiMessage = response.data.choices[0].message.content;
+    userSessions[phoneNumberId].push({ role: "assistant", content: aiMessage });
+    return aiMessage;
   } catch (error) {
     console.error("❌ Groq API error:", error.response?.data || error.message);
     throw error;
